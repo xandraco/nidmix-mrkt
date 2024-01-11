@@ -9,15 +9,14 @@ store.dispatch('fetchUser')
 </script>
 
 <template>
-  <header>
-      <nav v-if="$store.state.user">
+  <div>
+      <div v-if="$store.state.user">
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
-        <RouterLink to="/login">Login</RouterLink>
         <button @click="$store.dispatch('logout')">Logout</button>
-      </nav>
+      </div>
     <RouterView></RouterView>
-  </header>
+    </div>
 </template>
 
 <style scoped>
