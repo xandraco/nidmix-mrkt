@@ -13,7 +13,7 @@
             </a>
             <div class="row">
               <div class="col-4 d-grid">
-                <button class="btn btn-outline-dark btn-lg rounded-4 me-2" style="margin-top: 50vh;"> &lt; Atrás</button>
+                <button class="btn btn-outline-dark btn-lg rounded-4 me-2" style="margin-top: 50vh;"> Atrás</button>
               </div>
               <div class="col-8"></div>
             </div>
@@ -32,7 +32,7 @@
                 <br>
                 <div class="row">
                   <div class="col-5 d-grid">
-                    <button class="btn btn-outline-dark btn-lg rounded-4 me-2">Crear cuenta</button>
+                    <button class="btn btn-outline-dark btn-lg rounded-4 me-2" @click="ChangeRegister">Crear cuenta</button>
                   </div>
                   <div class="col-2">
                   </div>
@@ -42,15 +42,6 @@
                 </div>
               </form>
             </div>
-
-
-            <!-- Formulario de registro solo de forma provicional -->
-            <form class="register" @submit.prevent="register">
-              <h2>Register</h2>
-              <input type="email" placeholder="Email" v-model="register_form.email" />
-              <input type="password" placeholder="Password" v-model="register_form.password" />
-              <input type="submit" value="Register" />
-            </form>
           </div>
         </div>
       </div>
@@ -80,6 +71,11 @@ export default {
       register_form,
       login,
       register
+    }
+  },
+  methods: {
+    ChangeRegister (){
+      this.$router.push('/register')
     }
   }
 }

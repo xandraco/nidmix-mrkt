@@ -1,12 +1,12 @@
 import { createStore } from 'vuex'
 import router from '../router'
-import { auth } from '../backend/firebase/index.js'
+import { auth, db } from '../backend/firebase/index.js'
+import { collection, doc, setDoc } from 'firebase/firestore'
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut
 } from 'firebase/auth'
-
 
 export default createStore({
     state: {
@@ -43,10 +43,19 @@ export default createStore({
             router.push('/')
         },
         async register({ commit }, details) {
-            const { email, password } = details
+            const { email, password, firstName, lastName, User} = details
 
             try {
-                await createUserWithEmailAndPassword(auth, email, password)
+                const authUser = await createUserWithEmailAndPassword(auth, email, password)
+
+                 // Add user data to Firestore
+                 const userDocRef = doc(collection(db, 'Users'), authUser.user.uid)
+                 const userData = {
+                     firstName,
+                     lastName,
+                     User
+                 }
+                 await setDoc(userDocRef, userData)
             } catch (err) {
                 switch (err.code) {
                     case 'auth/email-already-in-use':
