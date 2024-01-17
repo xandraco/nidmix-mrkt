@@ -35,7 +35,7 @@ export default createStore({
                         alert("Contraseña incorrecta")
                         break;
                     default:
-                        alert("Algo ha salido mal")
+                        console.log(err)
                 }
                 return
             }
@@ -43,19 +43,19 @@ export default createStore({
             router.push('/')
         },
         async register({ commit }, details) {
-            const { email, password, firstName, lastName, User} = details
+            const { email, password, firstName, lastName, User } = details
 
             try {
                 const authUser = await createUserWithEmailAndPassword(auth, email, password)
 
-                 // Add user data to Firestore
-                 const userDocRef = doc(collection(db, 'Users'), authUser.user.uid)
-                 const userData = {
-                     firstName,
-                     lastName,
-                     User
-                 }
-                 await setDoc(userDocRef, userData)
+                // Add user data to Firestore
+                const userDocRef = doc(collection(db, 'Users'), authUser.user.uid)
+                const userData = {
+                    firstName,
+                    lastName,
+                    User
+                }
+                await setDoc(userDocRef, userData)
             } catch (err) {
                 switch (err.code) {
                     case 'auth/email-already-in-use':
@@ -71,7 +71,70 @@ export default createStore({
                         alert("La contraseña es muy débil")
                         break
                     default:
-                        alert("Algo ha salido mal")
+                        console.log(err)
+                }
+                return
+            }
+            commit('SET_USER', auth.currentUser)
+            router.push('/')
+        },
+        async registerPro({ commit }, details) {
+            const { email, password, firstName, lastName, User, profession, credentials, references, additional, CardName, CardLastName, CardNumber, CardCVV, BillingAddress, BillingPostal, CardYear, CardMonth, OficialID } = details
+
+            try {
+                const authUser = await createUserWithEmailAndPassword(auth, email, password)
+
+                // Add user data to Firestore
+                const userDocRef = doc(collection(db, 'Users'), authUser.user.uid)
+                const userData = {
+                    firstName,
+                    lastName,
+                    User,
+                    profession,
+                    credentials,
+                    references,
+                    additional,
+                    OficialID
+                }
+                const newCardData = {
+                    CardName,
+                    CardLastName,
+                    CardNumber,
+                    CardCVV,
+                    BillingAddress,
+                    BillingPostal,
+                    CardYear,
+                    CardMonth,
+                }
+                // Almacenar información del usuario
+                await setDoc(userDocRef, userData);
+
+                // Obtener referencia de la colección 'Cards' del usuario
+                const cardsCollectionRef = collection(userDocRef, 'Cards');
+
+                // Generar un ID único para la nueva tarjeta (por ejemplo, los últimos 4 dígitos de la tarjeta)
+                const cardId = CardNumber.slice(-4);
+
+                // Obtener referencia del documento de la nueva tarjeta
+                const cardDocRef = doc(cardsCollectionRef, cardId);
+
+                // Almacenar información de la tarjeta
+                await setDoc(cardDocRef, newCardData);
+            } catch (err) {
+                switch (err.code) {
+                    case 'auth/email-already-in-use':
+                        alert("Este correo ya existe")
+                        break
+                    case 'auth/invalid-email':
+                        alert("El correo no es válido")
+                        break
+                    case 'auth/operation-not-allowed':
+                        alert("Acción no válida")
+                        break
+                    case 'auth/weak-password':
+                        alert("La contraseña es muy débil")
+                        break
+                    default:
                         console.log(err)
                 }
                 return
@@ -80,19 +143,19 @@ export default createStore({
             router.push('/')
         },
         async logout({ commit }) {
-            await signOut (auth)
+            await signOut(auth)
 
             commit('CLEAR_USER')
 
             router.push('/login')
         },
-        fetchUser ({ commit }) {
+        fetchUser({ commit }) {
             auth.onAuthStateChanged(async user => {
                 if (user === null) {
                     commit('CLEAR_USER')
                 } else {
                     commit('SET_USER', user)
-                    
+
                     if (router.isReady() && router.currentRoute.value.path === '/login') {
                         router.push('/')
                     }
